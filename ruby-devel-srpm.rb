@@ -53,7 +53,7 @@ mock.install %w(autoconf bison ruby subversion)
 
 SVNURL = URI.parse("http://svn.ruby-lang.org/repos/ruby/")
 mock.chroot "svn checkout #{SVNURL}trunk ~/ruby"
-make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot tmp"
+make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot tmp #{ENV['VERSION']}"
 
 if (ruby_revision = make_snapshot_log.lines[1][/\d+/]).empty?
   raise "make-snapshot output format different then expected. Revision hasn't been detected."
