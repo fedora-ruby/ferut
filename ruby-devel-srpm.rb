@@ -53,14 +53,16 @@ mock.install %w(autoconf bison ruby subversion)
 
 SVNURL = URI.parse("http://svn.ruby-lang.org/repos/ruby/")
 mock.chroot "svn checkout #{SVNURL}trunk ~/ruby"
-mock.chroot "cd ~/ruby && tool/make-snapshot tmp"
+make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot tmp"
+
+if (ruby_revision = make_snapshot_log.lines[1][/\d+/]).empty?
+  raise "make-snapshot output format different then expected. Revision hasn't been detected."
+end
 
 ruby_archives = mock.chroot "ls ~/ruby/tmp | grep bz2", :quiet => true
-ruby_archive = ruby_archives.split.sort.last
+ruby_archive = ruby_archives.split.find {|ra| ra =~ /#{ruby_revision}/}
 
 mock.copyout "~/ruby/tmp/#{ruby_archive}", "."
-
-ruby_revision = ruby_archive[/-r(\d+).tar.bz2/, 1]
 
 ruby_spec = File.read('ruby.spec')
 
