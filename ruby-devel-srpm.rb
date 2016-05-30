@@ -25,7 +25,7 @@ class Mock
   end
 
   def chroot(*cmd)
-    command("--chroot", cmd)
+    command("--old-chroot --chroot", cmd)
   end
 
   def copyout(*cmd)
@@ -49,7 +49,7 @@ end
 
 mock = Mock.new :root => 'ruby'
 
-mock.install %w(autoconf bison ruby subversion)
+mock.install %w(autoconf bison ruby rubypick rubygems subversion)
 
 SVNURL = URI.parse("http://svn.ruby-lang.org/repos/ruby/")
 mock.chroot "svn checkout #{SVNURL}trunk ~/ruby"
