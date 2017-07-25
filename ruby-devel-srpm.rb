@@ -25,7 +25,7 @@ class Mock
   end
 
   def chroot(*cmd)
-    command("--old-chroot --chroot", cmd)
+    command("--chroot", cmd)
   end
 
   def copyout(*cmd)
