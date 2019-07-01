@@ -49,13 +49,13 @@ end
 
 mock = Mock.new :root => 'ruby'
 
-mock.install %w(autoconf bison ruby rubypick rubygems subversion)
+mock.install %w(autoconf bison ruby rubypick rubygems git)
 
-SVNURL = URI.parse("http://svn.ruby-lang.org/repos/ruby/")
-mock.chroot "svn checkout #{SVNURL}trunk ~/ruby"
-make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz tmp #{ENV['VERSION']}"
+GITURL = URI.parse("https://github.com/ruby/ruby")
+mock.chroot "git clone #{GITURL} ~/ruby"
+make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz -git=https://github.com/ruby/ruby tmp #{ENV['VERSION']}"
 
-if (ruby_revision = make_snapshot_log.lines[1][/\d+/]).empty?
+if (ruby_revision = make_snapshot_log.lines[0][/@(.*)$/, 1].strip[0, 10]).empty?
   raise "make-snapshot output format different then expected. Revision hasn't been detected."
 end
 
@@ -67,7 +67,7 @@ mock.copyout "~/ruby/tmp/#{ruby_archive}", "."
 ruby_spec = File.read('ruby.spec')
 
 # Fix Ruby revision.
-ruby_revision_old = ruby_spec[/%global revision (\d{5})/, 1]
+ruby_revision_old = ruby_spec[/%global revision (.*)$/, 1]
 ruby_spec.gsub!(/#{ruby_revision_old}/, ruby_revision)
 
 File.open('ruby.spec', "w") {|file| file.puts ruby_spec }
