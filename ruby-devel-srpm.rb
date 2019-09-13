@@ -55,8 +55,15 @@ GITURL = URI.parse("https://github.com/ruby/ruby")
 mock.chroot "git clone #{GITURL} ~/ruby"
 make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz -git=https://github.com/ruby/ruby tmp #{ENV['VERSION']}"
 
-if (ruby_revision = make_snapshot_log.lines[0][/@(.*)$/, 1].strip[0, 10]).empty?
-  raise "make-snapshot output format different then expected. Revision hasn't been detected."
+revision_match = make_snapshot_log.lines[0].match /@(.*)$/
+if !revision_match || (ruby_revision = revision_match[1].strip[0, 10]).empty?
+  raise <<~HEREDOC
+    make-snapshot output format different then expected. Revision hasn't been detected.
+
+    ~~~
+    #{make_snapshot_log}
+    ~~~
+  HEREDOC
 end
 
 ruby_archives = mock.chroot "ls ~/ruby/tmp | grep xz", :quiet => true
