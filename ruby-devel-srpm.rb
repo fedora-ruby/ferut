@@ -25,7 +25,7 @@ class Mock
   end
 
   def chroot(*cmd)
-    command("--chroot", cmd)
+    command("--unpriv --chroot", cmd)
   end
 
   def copyout(*cmd)
