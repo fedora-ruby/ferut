@@ -53,7 +53,7 @@ mock.install %w(autoconf bison ruby rubypick rubygems git)
 
 GITURL = URI.parse("https://github.com/ruby/ruby")
 mock.chroot "git clone #{GITURL} ~/ruby"
-make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz -git=https://github.com/ruby/ruby tmp #{ENV['VERSION']}"
+make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz tmp #{ENV['VERSION']}"
 
 revision_match = make_snapshot_log.lines[0].match /@(.*)$/
 if !revision_match || (ruby_revision = revision_match[1].strip[0, 10]).empty?
