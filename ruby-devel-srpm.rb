@@ -49,7 +49,7 @@ end
 
 mock = Mock.new :root => 'ruby'
 
-mock.install %w(autoconf bison ruby rubypick rubygems git)
+mock.install %w(autoconf bison ruby rubypick rubygems rubygem-json git)
 
 GITURL = URI.parse("https://github.com/ruby/ruby")
 mock.chroot "git clone #{GITURL} ~/ruby"
