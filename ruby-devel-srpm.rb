@@ -71,11 +71,33 @@ ruby_archive = ruby_archives.split.find {|ra| ra =~ /#{ruby_revision}/}
 
 mock.copyout "~/ruby/tmp/#{ruby_archive}", "."
 
+default_gems = mock.chroot %q[cd ~/ruby && find {lib,ext} -name *.gemspec -exec ruby -Ilib:ext -e "Gem::Specification.load(%({})).tap {|s| puts %(\"#{s.name}\" => \"#{s.version}\",)}" \;]
+puts default_gems.lines.sort.join if ENV['DEBUG']
+default_gems = "{#{default_gems}}"
+default_gems = eval(default_gems)
+
+bundled_gems = mock.chroot 'cd ~/ruby && cat gems/bundled_gems'
+puts bundled_gems if ENV['DEBUG']
+bundled_gems.gsub!(/\shttp.*/, '')
+bundled_gems = bundled_gems.lines.map {|l| l.split}
+bundled_gems = bundled_gems.to_h
+
 ruby_spec = File.read('ruby.spec')
 
 # Fix Ruby revision.
 ruby_revision_old = ruby_spec[/%global revision (.*)$/, 1]
 ruby_spec.gsub!(/#{ruby_revision_old}/, ruby_revision)
+
+# Fix gem versions.
+default_gems.merge(bundled_gems).each do |name, version|
+  ruby_spec.gsub!(/\/#{name}-\d.*\.gemspec/) do |match|
+    match !~ /%\{/ ? "/#{name}-#{version}.gemspec" : match
+  end
+  underscore_name = name.gsub(?-, ?_)
+  ruby_spec.gsub!(/ #{underscore_name}_version \d.*/) do |match|
+    " #{underscore_name}_version #{version}"
+  end
+end
 
 File.open('ruby.spec', "w") {|file| file.puts ruby_spec }
 
