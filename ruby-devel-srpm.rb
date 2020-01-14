@@ -89,14 +89,26 @@ ruby_revision_old = ruby_spec[/%global revision (.*)$/, 1]
 ruby_spec.gsub!(/#{ruby_revision_old}/, ruby_revision)
 
 # Fix gem versions.
-default_gems.merge(bundled_gems).each do |name, version|
+remaining_gems = default_gems.merge(bundled_gems).reject do |name, version|
+  reject = false
+
   ruby_spec.gsub!(/\/#{name}-\d.*\.gemspec/) do |match|
+    reject = true
     match !~ /%\{/ ? "/#{name}-#{version}.gemspec" : match
   end
+
   underscore_name = name.gsub(?-, ?_)
   ruby_spec.gsub!(/ #{underscore_name}_version \d.*/) do |match|
+    reject = true
     " #{underscore_name}_version #{version}"
   end
+
+  reject
+end
+
+unless remaining_gems.empty?
+  puts "!!! Following gems were not found in ruby.spec file:"
+  remaining_gems.each {|name, version| puts "#{name} - #{version}"}
 end
 
 File.open('ruby.spec', "w") {|file| file.puts ruby_spec }
