@@ -40,6 +40,7 @@ class Mock
     mock_command = %w(mock)
     mock_command += ['-r', root] if root
     mock_command += %w(-q) if options[:quiet]
+    mock_command += %w(--enable-network)
     mock_command += cmd
 
     p mock_command.compact.join ' ' if ENV['DEBUG']
