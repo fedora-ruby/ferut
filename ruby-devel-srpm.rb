@@ -109,7 +109,7 @@ end
 
 unless remaining_gems.empty?
   puts "!!! Following gems were not found in ruby.spec file:"
-  remaining_gems.each {|name, version| puts "#{name} - #{version}"}
+  remaining_gems.sort.each {|name, version| puts "#{name} - #{version}"}
 end
 
 File.open('ruby.spec', "w") {|file| file.puts ruby_spec }
