@@ -109,7 +109,7 @@ remaining_gems = default_gems.merge(bundled_gems).reject do |name, version|
 end
 
 unless remaining_gems.empty?
-  puts "!!! Following gems were not found in ruby.spec file:"
+  puts "!!! The following gems should possibly be added into ruby.spec file:"
   remaining_gems.sort.each {|name, version| puts "#{name} - #{version}"}
 end
 
