@@ -11,6 +11,9 @@ git checkout -b $RUBY_GIT_WORKING_BRANCH
 for p in \
   $(sed -n "/^Patch[[:digit:]]\+: / s/Patch[[:digit:]]\+:[[:blank:]]\+// p" $RUBY_DIST_GIT/ruby.spec)
 do
+  echo
+  echo "* $p"
+
   # The following file is reversly applied.
   [[ "$p" == "ruby-3.0.3-ext-openssl-extconf.rb-require-OpenSSL-version-1.0.1.patch" ]] && continue
 
