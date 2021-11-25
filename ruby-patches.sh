@@ -2,8 +2,8 @@
 
 RUBY_DIST_GIT=$HOME/fedora-scm/own/ruby
 RUBY_GIT_REF=master
-RUBY_GIT_WORKING_BRANCH=fedora-ruby-3.0
-RUBY_GIT_WORKING_TAG=fedora-ruby-3.0-tag
+RUBY_GIT_WORKING_BRANCH=fedora-ruby-$RUBY_GIT_REF
+RUBY_GIT_WORKING_TAG=fedora-ruby-$RUBY_GIT_REF-tag
 
 git checkout $RUBY_GIT_REF && \
 git checkout -b $RUBY_GIT_WORKING_BRANCH
