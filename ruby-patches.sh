@@ -13,8 +13,11 @@ for p in \
 do
   # The following file is reversly applied.
   [[ "$p" == "ruby-3.0.3-ext-openssl-extconf.rb-require-OpenSSL-version-1.0.1.patch" ]] && continue
-  # Not in Git format.
-  [[ "$p" == "ruby-3.1.0-SSL_read-EOF-handling.patch" ]] && continue
+
+  if ! egrep -q "^Subject:" $RUBY_DIST_GIT/$p; then
+    echo "! Not in Git format: $p"
+    continue
+  fi
 
   git tag -f $RUBY_GIT_WORKING_TAG && \
   git am $RUBY_DIST_GIT/$p && \
