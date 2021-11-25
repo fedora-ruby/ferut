@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-RUBY_DIST_GIT=$HOME/fedora-scm/own/ruby
-RUBY_GIT_REF=master
+RUBY_DIST_GIT=${RUBY_DIST_GIT:-$HOME/fedora-scm/own/ruby}
+RUBY_GIT_REF=${RUBY_GIT_REF:-master}
 RUBY_GIT_WORKING_BRANCH=fedora-ruby-$RUBY_GIT_REF
 RUBY_GIT_WORKING_TAG=fedora-ruby-$RUBY_GIT_REF-tag
 
