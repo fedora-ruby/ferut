@@ -24,7 +24,7 @@ do
 
   git tag -f $RUBY_GIT_WORKING_TAG && \
   git am $RUBY_DIST_GIT/$p && \
-  git format-patch $RUBY_GIT_WORKING_TAG..HEAD --stdout > $RUBY_DIST_GIT/$p || \
+  git format-patch --no-signature $RUBY_GIT_WORKING_TAG..HEAD --stdout > $RUBY_DIST_GIT/$p || \
   exit 1
 done
 
