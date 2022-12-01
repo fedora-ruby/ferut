@@ -17,7 +17,7 @@ do
   # The following file is reversly applied.
   [[ "$p" == "ruby-3.0.3-ext-openssl-extconf.rb-require-OpenSSL-version-1.0.1.patch" ]] && continue
 
-  if ! egrep -q "^Subject:" $RUBY_DIST_GIT/$p; then
+  if ! grep -E -q "^Subject:" $RUBY_DIST_GIT/$p; then
     echo "! Not in Git format: $p"
     continue
   fi
