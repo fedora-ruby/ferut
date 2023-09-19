@@ -68,7 +68,7 @@ if !revision_match || (ruby_revision = revision_match[1].strip[0, 10]).empty?
 end
 
 ruby_archives = mock.chroot "ls ~/ruby/tmp | grep xz", :quiet => true
-ruby_archive = ruby_archives.split.find {|ra| ra =~ /#{ruby_revision}/}
+ruby_archive = ruby_archives.split.find {|ra| ra =~ /#{ruby_revision}/} || ruby_archives.split.find {|ra| ra =~ /#{ENV['VERSION']}/}
 
 mock.copyout "~/ruby/tmp/#{ruby_archive}", "."
 
