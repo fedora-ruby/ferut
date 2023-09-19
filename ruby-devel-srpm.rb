@@ -54,7 +54,7 @@ mock.install %w(make autoconf ruby rubygems rubygem-json git)
 
 GITURL = URI.parse("https://github.com/ruby/ruby")
 mock.chroot "git clone #{GITURL} ~/ruby"
-make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz tmp #{ENV['VERSION']}"
+make_snapshot_log = mock.chroot "cd ~/ruby && tool/make-snapshot -packages=xz -keep_temp tmp #{ENV['VERSION']}"
 
 revision_match = make_snapshot_log.lines[0].match /@(.*)$/
 if !revision_match || (ruby_revision = revision_match[1].strip[0, 10]).empty?
@@ -72,17 +72,33 @@ ruby_archive = ruby_archives.split.find {|ra| ra =~ /#{ruby_revision}/} || ruby_
 
 mock.copyout "~/ruby/tmp/#{ruby_archive}", "."
 
-default_gems = mock.chroot %q[cd ~/ruby && find {lib,ext} -name *.gemspec -exec ruby -Ilib:ext -e "Gem::Specification.load(%({})).tap {|s| puts %(\"#{s.name}\" => \"#{s.version}\",)}" \;]
+snapshot_directory = make_snapshot_log.lines[1][/'(.*)'/, 1]
+if snapshot_directory.empty?
+  raise <<~HEREDOC
+    make-snapshot output format different then expected. Snapshot directory hasn't been detected.
+
+    ~~~
+    #{make_snapshot_log}
+    ~~~
+  HEREDOC
+end
+snapshot_directory = mock.chroot "find #{File.dirname snapshot_directory} -mindepth 1 -maxdepth 1 | head -1"
+snapshot_directory.strip!
+
+default_gems = mock.chroot "cd #{snapshot_directory}" + %q[ && find {lib,ext} -name *.gemspec -exec ruby -Ilib:ext -e "Gem::Specification.load(%({})).tap {|s| puts %(\"#{s.name}\" => \"#{s.version}\",)}" \; 2> /dev/null]
 puts default_gems.lines.sort.join if ENV['DEBUG']
 default_gems = "{#{default_gems}}"
 default_gems = eval(default_gems)
 
-bundled_gems = mock.chroot 'cd ~/ruby && cat gems/bundled_gems'
+bundled_gems = mock.chroot %Q[cd #{snapshot_directory} && cat gems/bundled_gems]
 puts bundled_gems if ENV['DEBUG']
 bundled_gems.gsub!(/\shttp.*/, '')
 bundled_gems = bundled_gems.lines.delete_if {|l| l.start_with? ?#}
 bundled_gems = bundled_gems.map {|l| l.split}
 bundled_gems = bundled_gems.to_h
+
+# Cleanup snapshot temporary directory. All data has been mined at this stage.
+mock.chroot %Q[rm -rf #{File.dirname snapshot_directory}]
 
 ruby_spec = File.read('ruby.spec')
 
