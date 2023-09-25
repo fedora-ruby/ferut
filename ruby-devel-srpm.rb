@@ -110,11 +110,6 @@ ruby_spec.gsub!(/#{ruby_revision_old}/, ruby_revision)
 remaining_gems = default_gems.merge(bundled_gems).reject do |name, version|
   reject = false
 
-  ruby_spec.gsub!(/\/#{name}-\d.*\.gemspec/) do |match|
-    reject = true
-    match !~ /%\{/ ? "/#{name}-#{version}.gemspec" : match
-  end
-
   underscore_name = name.gsub(?-, ?_)
   ruby_spec.gsub!(/ #{underscore_name}_version \d.*/) do |match|
     reject = true
