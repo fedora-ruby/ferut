@@ -2,6 +2,7 @@
 #
 # This scipt is designed to work with mock 1.2.0+
 
+require 'date'
 require 'uri'
 require 'shellwords'
 
@@ -105,6 +106,11 @@ ruby_spec = File.read('ruby.spec')
 # Fix Ruby revision.
 ruby_revision_old = ruby_spec[/%global revision (.*)$/, 1]
 ruby_spec.gsub!(/#{ruby_revision_old}/, ruby_revision)
+
+# Update changelog date. This date is used by RPM as a source for
+# SOURCE_DATE_EPOCH, influencing the date in NVR.
+current_date = Date.today.strftime("%a %b %d %Y")
+ruby_spec.sub!(/(%changelog\n?\*) (\w{3} \w{3} \d{2} \d{4})/, "\\1 #{current_date}")
 
 # Fix gem versions.
 remaining_gems = default_gems.merge(bundled_gems).reject do |name, version|
