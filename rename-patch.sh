@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-mv $1 $(sed -ne '/^Subject: /{
+new_name=$(sed -ne '/^Subject: /{
         s/^Subject: *\[PATCH[^]]*\] *//;
         s/[^[:alnum:]]/-/g;
         s/--*/-/g;
@@ -9,3 +9,7 @@ mv $1 $(sed -ne '/^Subject: /{
         p;
         q;
 }' $1)
+
+echo "${1} => ${new_name}"
+
+mv $1 ${new_name}
