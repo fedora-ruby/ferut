@@ -94,7 +94,7 @@ default_gems = eval(default_gems)
 bundled_gems = mock.chroot %Q[cd #{snapshot_directory} && cat gems/bundled_gems]
 puts bundled_gems if ENV['DEBUG']
 bundled_gems.gsub!(/\shttp.*/, '')
-bundled_gems = bundled_gems.lines.delete_if {|l| l.start_with? ?#}
+bundled_gems = bundled_gems.lines.delete_if {|l| l.strip.empty? || l.start_with?(?#)}
 bundled_gems = bundled_gems.map {|l| l.split}
 bundled_gems = bundled_gems.to_h
 
